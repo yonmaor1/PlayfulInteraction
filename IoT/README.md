@@ -58,7 +58,7 @@ Here's what we need our smart devices to be able to do:
 ## Lets Get Coding
 
 ### Connecting to the Internet
-This part isn't all that hard, so all of the code is provided in the starter. You'll just have to fill in the name and password of the WiFi network you're using
+This part isn't all that hard, so all of the code is provided in the starter. You'll just have to fill in the name and password of the WiFi network you're using, and call the `setup_wifi` function.
 
 ### Connect to a network where we can send a receive data
 
@@ -79,18 +79,58 @@ In this model, devices (clients) can publish messages to a central broker on spe
 
 #### Connecting to the MQTT Server 
 
-We first have to establish a connection to the MQTT server. We do this by repeatedly calling 
+We first have to initialize out MQTT client to be able to talk to the server. We do this via
+```cpp
+mqtt_client.setServer(MQTT_SERVER, MQTT_SERVER_PORT);
+```
+which function should this be called in? (setup / loop)
+
+Now have to establish a connection to the MQTT server. We do this by calling 
 ```cpp
 mqtt_client.connect(mqtt_client_id.c_str(), MQTT_USER, MQTT_PASSWORD)
 ```
-Until a connection has been established. the `mqtt_client_id` variable must be unique and configured on the MQTT server ahead of time. We will be using a [cedalo](https://platform.cedalo.cloud) server for this.
+Until a connection has been established. the `mqtt_client_id` variable must be unique and configured on the MQTT server ahead of time. We will be using a [cedalo](https://platform.cedalo.cloud) server for this. Note that we would like to repeatadly try connecting until we succeed, so the complete code looks like this:
+```cpp
+void connect() {
+  while (!mqtt_client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    String mqtt_client_id = "1";
+    if (mqtt_client.connect(mqtt_client_id.c_str(), MQTT_USER, MQTT_PASSWORD)) {
+      Serial.println("connected");
+      mqtt_client.subscribe(MQTT_TOPIC_IN);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqtt_client.state());
+      Serial.println(" will try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+```
+Note the call to `mqtt_client.subscribe(MQTT_TOPIC_IN);`. This subscribes our device to the chosen topic. (Make sure you know what that means!)
+
+This function is called `connect`, but we could also call it `reconnect` because we can call it if we ever get disconnected from the server. Ie, we can call it like so:
+```cpp
+if (!mqtt_client.connected()) {
+    connect();
+}
+```
+which function should this be called in? (setup / loop)
 
 #### Subscribing
 Once a connection has been made, we can subscribe to a topic via
 ```cpp
 mqtt_client.subscribe(MQTT_TOPIC_IN);
 ```
-where `MQTT_TOPIC_IN` is the topic you want to listen for.
+where `MQTT_TOPIC_IN` is the topic you want to listen for. This is done in the `connect` function.
+
+Now that we're subscribed, we can process incoming messages like so:
+```cpp
+mqtt_client.loop();
+time_client.update();
+```
+
+This simply performs the main loop of the mqtt client.
 
 
 #### Publishing
@@ -127,4 +167,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 ```
 
-we will print the message topic and payload to the serial monitor.
+we will print the message topic and payload to the serial monitor. Your callback function can contain whatever you want. 
+
+### And That's That!
+
+Hook up your inputs and outputs, and you've got yourself an IoT system. 
+
+## The Other End
+The other smart device in our system is a python script running locally on my computer. Note how now that we're working in IoT, we're able to have systems built in different languages and frameworks communicate with each other via a shared 'language' (what do we call this shared language?)
+
+You can check out the code in `src/app.py`

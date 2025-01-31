@@ -85,12 +85,11 @@ void connect() {
 
 //--------------------------------------
 void setup() {
-
-  Serial.begin(115200);
+  
   setup_wifi();          
 
-  // Serial.begin(115200);   // initialize serial communication
-  // mqtt_client.setCallback(callback);  // set callback function
+  Serial.begin(115200);   // initialize serial communication
+  mqtt_client.setCallback(callback);  // set callback function
 
   // init pins
   pinMode(D0, OUTPUT);
