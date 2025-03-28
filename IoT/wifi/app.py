@@ -16,6 +16,8 @@ import io
 import sys
 import concurrent.futures
 
+print("Starting IoT application...")
+
 # music configs
 MAX_QUEUE_LENGTH = 10
 THRESHOLD = 50  # Change threshold for playing a note
