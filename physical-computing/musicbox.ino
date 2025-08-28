@@ -4,7 +4,7 @@ int map(int val, int ilo, int ihi, int olo, int ohi) {
 
 void setup() {
   pinMode(A1, INPUT);
-  pinMode(A0, INPUT);
+  pinMode(A0, OUTPUT);
 }
 
 int volume;
