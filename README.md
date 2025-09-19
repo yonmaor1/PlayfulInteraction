@@ -12,6 +12,3 @@ Lecture Slides
 
 
 [Lecture Notes](https://docs.google.com/document/d/1mShnjaHoTijPoOlIi3wGNPECOhIGrRGky4AvRpS28HU/edit?usp=sharing)
-
-
-[Explaining IOT Code](https://randomnerdtutorials.com/esp32-web-server-arduino-ide/)
